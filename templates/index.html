@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActiGuard-LLM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+    }
+
+    .light {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #9ca3af; /* Gray default */
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: all 0.3s ease;
+    }
+
+    .light-red-active {
+      background-color: #ff0000 !important;
+      box-shadow: 0 10px 25px rgba(255, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    }
+
+    .light-green-active {
+      background-color: #22c55e !important;
+      box-shadow: 0 10px 25px rgba(34, 197, 94, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    }
+
+    .blinking {
+      animation: blink 0.8s infinite alternate;
+    }
+
+    @keyframes blink {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.03);
+      }
+    }
+
+    /* Scrollbar styling for incident summary */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Full-screen Loading Overlay */
+    #loadingOverlay {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    #loadingOverlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col justify-between text-slate-800">
+  
+  <!-- Navbar -->
+  {% include 'Navbar.html' %}
+
+  <!-- Main Workspace -->
+  <main class="flex-grow flex items-center justify-center px-4 py-8">
+    <div class="w-full max-w-6xl bg-white shadow-xl rounded-xl p-8 border border-slate-200">
+      
+      <!-- App Title -->
+      <h2 class="text-3xl font-extrabold text-[#1e293b] text-center mb-8">ActiGuard-LLM</h2>
+
+      <!-- Form Section -->
+      <form id="uploadForm" action="/" method="post" enctype="multipart/form-data" class="space-y-4">
+        <div class="flex items-center space-x-4">
+          <!-- Custom Choose File styling matching the image -->
+          <label class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-4 rounded-md border border-gray-300 transition duration-150">
+            Choose File
+            <input type="file" name="file" accept="video/*" required class="hidden" id="fileInput" />
+          </label>
+          <span id="fileNameLabel" class="text-sm text-gray-500 italic">No file chosen</span>
+        </div>
+
+        <button type="submit" class="w-full bg-[#10b981] hover:bg-[#059669] text-white font-bold py-3 px-4 rounded-lg tracking-wide transition duration-150">
+          Upload & Detect
+        </button>
+      </form>
+
+      <!-- Video, Lights, and LLM Analysis Outputs -->
+      {% if input_video %}
+      <div id="videoSection" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slate-200"
+           data-detection-results="{{ detection_results | safe }}"
+           data-native-fps="{{ native_fps | default(25.0) }}">
+        
+        <!-- Left Column: Video Player & Indicators -->
+        <div class="flex flex-col items-center">
+          <h3 class="text-lg font-bold text-gray-700 mb-3 self-start">Uploaded Video:</h3>
+          
+          <div class="w-full rounded-lg overflow-hidden border border-gray-300 bg-black shadow-md">
+            <video class="w-full h-auto aspect-video" controls id="uploadedVideo">
+              <source src="{{ input_video }}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
+          <!-- Video FPS display -->
+          <div class="mt-2 text-sm text-slate-500 font-semibold self-start flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"></path>
+            </svg>
+            Average Video FPS: <span class="text-slate-800 font-bold" id="fpsDisplay">{{ video_fps }}</span>
+          </div>
+
+          <!-- Dual Circle Indicators -->
+          <div class="flex justify-center space-x-12 mt-8">
+            <!-- Violence Circle -->
+            <div class="flex flex-col items-center space-y-2">
+              <div id="redLight" class="light flex items-center justify-center text-white font-bold text-sm">
+                <span id="redConfidence"></span>
+              </div>
+              <span class="text-sm font-semibold text-rose-600">Violence</span>
+            </div>
+
+            <!-- Non-Violence Circle -->
+            <div class="flex flex-col items-center space-y-2">
+              <div id="greenLight" class="light flex items-center justify-center text-white font-bold text-sm">
+                <span id="greenConfidence"></span>
+              </div>
+              <span class="text-sm font-semibold text-emerald-600">Non-Violence</span>
+            </div>
+          </div>
+
+          <!-- Reset Button -->
+          <button id="clearBtn" class="mt-6 bg-[#ef4444] hover:bg-[#dc2626] text-white font-bold py-2.5 px-6 rounded-lg shadow transition duration-150">
+            Clear Video
+          </button>
+        </div>
+
+        <!-- Right Column: LLM-Generated Incident Summary -->
+        <div class="flex flex-col">
+          <h3 class="text-lg font-bold text-gray-700 mb-3 flex items-center gap-2">
+            <span>🧠</span> LLM-Generated Incident Summary
+          </h3>
+          
+          <!-- Report Textbox matching the layout in screenshot -->
+          <div class="flex-grow min-h-[300px] max-h-[420px] overflow-y-auto border border-gray-200 rounded-lg p-5 bg-slate-50 text-slate-700 leading-relaxed custom-scrollbar shadow-inner text-sm md:text-base">
+            {% if llm_report %}
+              {{ llm_report | safe }}
+            {% else %}
+              <p class="text-gray-400 italic">No report generated.</p>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      {% endif %}
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 bg-slate-100 text-center text-xs text-slate-500 border-t border-slate-200">
+    &copy; 2026 ActiGuard Security Labs. All Rights Reserved.
+  </footer>
+
+  <!-- Glassmorphic processing loader -->
+  <div id="loadingOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center max-w-sm text-center">
+      <div class="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+      <h3 class="text-lg font-bold text-slate-800">Processing Video Feed</h3>
+      <p class="text-sm text-slate-500 mt-2">ActiGuard YOLOv8 model is processing the video and OpenRouter LLM is generating the incident summary. Please wait...</p>
+    </div>
+  </div>
+
+  <script>
+    // Choose file input handler to update filename label
+    const fileInput = document.getElementById("fileInput");
+    const fileNameLabel = document.getElementById("fileNameLabel");
+    
+    if (fileInput) {
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          fileNameLabel.textContent = e.target.files[0].name;
+          fileNameLabel.classList.remove("text-gray-500", "italic");
+          fileNameLabel.classList.add("text-slate-800", "font-medium");
+        } else {
+          fileNameLabel.textContent = "No file chosen";
+          fileNameLabel.classList.add("text-gray-500", "italic");
+          fileNameLabel.classList.remove("text-slate-800", "font-medium");
+        }
+      });
+    }
+
+    // Handle form submit loader show
+    const uploadForm = document.getElementById("uploadForm");
+    const loadingOverlay = document.getElementById("loadingOverlay");
+    
+    if (uploadForm) {
+      uploadForm.addEventListener("submit", () => {
+        if (loadingOverlay) {
+          loadingOverlay.classList.add("active");
+        }
+      });
+    }
+
+    // Playback sync code
+    const videoSection = document.getElementById("videoSection");
+    if (videoSection) {
+      const detectionResults = JSON.parse(videoSection.getAttribute("data-detection-results") || "[]");
+      const redLight = document.getElementById("redLight");
+      const greenLight = document.getElementById("greenLight");
+      const video = document.getElementById("uploadedVideo");
+      const clearBtn = document.getElementById("clearBtn");
+
+    function resetLights() {
+      redLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+      greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+      
+      const detectionLabel = document.getElementById("detectionLabel");
+      const redConfidence = document.getElementById("redConfidence");
+      const greenConfidence = document.getElementById("greenConfidence");
+      
+      if (detectionLabel) {
+        detectionLabel.textContent = "--";
+        detectionLabel.className = "mt-6 text-xl font-bold text-slate-400";
+      }
+      if (redConfidence) redConfidence.textContent = "";
+      if (greenConfidence) greenConfidence.textContent = "";
+    }
+
+    function updateLights(label, confidence) {
+      const detectionLabel = document.getElementById("detectionLabel");
+      const redConfidence = document.getElementById("redConfidence");
+      const greenConfidence = document.getElementById("greenConfidence");
+
+      if (label === "Violence") {
+        redLight.className = "light light-red-active blinking flex items-center justify-center text-white font-bold text-sm";
+        greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+
+        if (redConfidence) redConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
+        if (greenConfidence) greenConfidence.textContent = "";
+        
+        if (detectionLabel) {
+          detectionLabel.textContent = "Violence";
+          detectionLabel.className = "mt-6 text-xl font-bold text-rose-600 uppercase tracking-wide";
+        }
+      } else if (label === "Non-Violence") {
+        greenLight.className = "light light-green-active blinking flex items-center justify-center text-white font-bold text-sm";
+        redLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+
+        if (greenConfidence) greenConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
+        if (redConfidence) redConfidence.textContent = "";
+        
+        if (detectionLabel) {
+          detectionLabel.textContent = "Non-Violence";
+          detectionLabel.className = "mt-6 text-xl font-bold text-emerald-600 uppercase tracking-wide";
+        }
+      } else {
+        resetLights();
+      }
+    }
+
+    let animationFrameId;
+    let lastFrame = -1;
+    const fps = parseFloat(videoSection.getAttribute("data-native-fps") || "25.0"); // Native frame rate of the video for playback sync
+
+    function syncLightsToVideo() {
+      if (video.paused || video.ended) {
+        cancelAnimationFrame(animationFrameId);
+        resetLights();
+        return;
+      }
+
+      const currentFrame = Math.floor(video.currentTime * fps);
+      if (currentFrame !== lastFrame) {
+        const result = detectionResults[currentFrame] || {};
+        const label = result?.label;
+        const confidence = result?.confidence;
+        updateLights(label, confidence);
+        lastFrame = currentFrame;
+      }
+
+      animationFrameId = requestAnimationFrame(syncLightsToVideo);
+    }
+
+    if (video) {
+      video.addEventListener("play", () => {
+        syncLightsToVideo();
+      });
+
+      video.addEventListener("pause", () => {
+        cancelAnimationFrame(animationFrameId);
+        resetLights();
+      });
+
+      video.addEventListener("ended", () => {
+        cancelAnimationFrame(animationFrameId);
+        resetLights();
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        if (videoSection) {
+          videoSection.remove();
+        }
+        if (fileInput) {
+          fileInput.value = "";
+          fileNameLabel.textContent = "No file chosen";
+          fileNameLabel.classList.add("text-gray-500", "italic");
+          fileNameLabel.classList.remove("text-slate-800", "font-medium");
+        }
+      });
+    }
+    }
+  </script>
+
+  <!-- Location tracking hidden injection -->
+  <script>
+    let userLatitude = null;
+    let userLongitude = null;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+        userLatitude = position.coords.latitude;
+        userLongitude = position.coords.longitude;
+
+        const form = document.getElementById("uploadForm");
+        if (form) {
+          const latInput = document.createElement("input");
+          latInput.type = "hidden";
+          latInput.name = "latitude";
+          latInput.value = userLatitude;
+
+          const lonInput = document.createElement("input");
+          lonInput.type = "hidden";
+          lonInput.name = "longitude";
+          lonInput.value = userLongitude;
+
+          form.appendChild(latInput);
+          form.appendChild(lonInput);
+        }
+      });
+    }
+  </script>
+</body>
+
+</html>
