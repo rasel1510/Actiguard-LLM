@@ -107,7 +107,6 @@
       <!-- Video, Lights, and LLM Analysis Outputs -->
       {% if input_video %}
       <div id="videoSection" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-slate-200"
-           data-detection-results="{{ detection_results | safe }}"
            data-native-fps="{{ native_fps | default(25.0) }}">
         
         <!-- Left Column: Video Player & Indicators -->
@@ -224,112 +223,137 @@
     // Playback sync code
     const videoSection = document.getElementById("videoSection");
     if (videoSection) {
-      const detectionResults = JSON.parse(videoSection.getAttribute("data-detection-results") || "[]");
+      const detectionResults = {{ detection_results | safe if detection_results else '[]' }};
       const redLight = document.getElementById("redLight");
       const greenLight = document.getElementById("greenLight");
       const video = document.getElementById("uploadedVideo");
       const clearBtn = document.getElementById("clearBtn");
 
-    function resetLights() {
-      redLight.className = "light flex items-center justify-center text-white font-bold text-sm";
-      greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
-      
-      const detectionLabel = document.getElementById("detectionLabel");
-      const redConfidence = document.getElementById("redConfidence");
-      const greenConfidence = document.getElementById("greenConfidence");
-      
-      if (detectionLabel) {
-        detectionLabel.textContent = "--";
-        detectionLabel.className = "mt-6 text-xl font-bold text-slate-400";
-      }
-      if (redConfidence) redConfidence.textContent = "";
-      if (greenConfidence) greenConfidence.textContent = "";
-    }
-
-    function updateLights(label, confidence) {
-      const detectionLabel = document.getElementById("detectionLabel");
-      const redConfidence = document.getElementById("redConfidence");
-      const greenConfidence = document.getElementById("greenConfidence");
-
-      if (label === "Violence") {
-        redLight.className = "light light-red-active blinking flex items-center justify-center text-white font-bold text-sm";
-        greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
-
-        if (redConfidence) redConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
-        if (greenConfidence) greenConfidence.textContent = "";
-        
-        if (detectionLabel) {
-          detectionLabel.textContent = "Violence";
-          detectionLabel.className = "mt-6 text-xl font-bold text-rose-600 uppercase tracking-wide";
-        }
-      } else if (label === "Non-Violence") {
-        greenLight.className = "light light-green-active blinking flex items-center justify-center text-white font-bold text-sm";
+      function resetLights() {
         redLight.className = "light flex items-center justify-center text-white font-bold text-sm";
-
-        if (greenConfidence) greenConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
-        if (redConfidence) redConfidence.textContent = "";
+        greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+        
+        const detectionLabel = document.getElementById("detectionLabel");
+        const redConfidence = document.getElementById("redConfidence");
+        const greenConfidence = document.getElementById("greenConfidence");
         
         if (detectionLabel) {
-          detectionLabel.textContent = "Non-Violence";
-          detectionLabel.className = "mt-6 text-xl font-bold text-emerald-600 uppercase tracking-wide";
+          detectionLabel.textContent = "--";
+          detectionLabel.className = "mt-6 text-xl font-bold text-slate-400";
         }
-      } else {
-        resetLights();
-      }
-    }
-
-    let animationFrameId;
-    let lastFrame = -1;
-    const fps = parseFloat(videoSection.getAttribute("data-native-fps") || "25.0"); // Native frame rate of the video for playback sync
-
-    function syncLightsToVideo() {
-      if (video.paused || video.ended) {
-        cancelAnimationFrame(animationFrameId);
-        resetLights();
-        return;
+        if (redConfidence) redConfidence.textContent = "";
+        if (greenConfidence) greenConfidence.textContent = "";
       }
 
-      const currentFrame = Math.floor(video.currentTime * fps);
-      if (currentFrame !== lastFrame) {
-        const result = detectionResults[currentFrame] || {};
-        const label = result?.label;
-        const confidence = result?.confidence;
-        updateLights(label, confidence);
-        lastFrame = currentFrame;
+      function updateLights(label, confidence) {
+        const detectionLabel = document.getElementById("detectionLabel");
+        const redConfidence = document.getElementById("redConfidence");
+        const greenConfidence = document.getElementById("greenConfidence");
+
+        if (label === "Violence") {
+          redLight.className = "light light-red-active blinking flex items-center justify-center text-white font-bold text-sm";
+          greenLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+
+          if (redConfidence) redConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
+          if (greenConfidence) greenConfidence.textContent = "";
+          
+          if (detectionLabel) {
+            detectionLabel.textContent = "Violence";
+            detectionLabel.className = "mt-6 text-xl font-bold text-rose-600 uppercase tracking-wide";
+          }
+        } else if (label === "Non-Violence") {
+          greenLight.className = "light light-green-active blinking flex items-center justify-center text-white font-bold text-sm";
+          redLight.className = "light flex items-center justify-center text-white font-bold text-sm";
+
+          if (greenConfidence) greenConfidence.textContent = confidence ? `${confidence.toFixed(1)}%` : "";
+          if (redConfidence) redConfidence.textContent = "";
+          
+          if (detectionLabel) {
+            detectionLabel.textContent = "Non-Violence";
+            detectionLabel.className = "mt-6 text-xl font-bold text-emerald-600 uppercase tracking-wide";
+          }
+        } else {
+          resetLights();
+        }
       }
 
-      animationFrameId = requestAnimationFrame(syncLightsToVideo);
-    }
+      let animationFrameId;
+      let lastFrame = -1;
+      const fps = parseFloat(videoSection.getAttribute("data-native-fps") || "25.0"); // Native frame rate of the video for playback sync
 
-    if (video) {
-      video.addEventListener("play", () => {
-        syncLightsToVideo();
-      });
-
-      video.addEventListener("pause", () => {
-        cancelAnimationFrame(animationFrameId);
-        resetLights();
-      });
-
-      video.addEventListener("ended", () => {
-        cancelAnimationFrame(animationFrameId);
-        resetLights();
-      });
-    }
-
-    if (clearBtn) {
-      clearBtn.addEventListener("click", () => {
-        if (videoSection) {
-          videoSection.remove();
+      function updateForCurrentTime() {
+        if (!video) return;
+        const currentFrame = Math.floor(video.currentTime * fps);
+        if (currentFrame !== lastFrame) {
+          const result = detectionResults[currentFrame] || {};
+          const label = result?.label;
+          const confidence = result?.confidence;
+          updateLights(label, confidence);
+          lastFrame = currentFrame;
         }
-        if (fileInput) {
-          fileInput.value = "";
-          fileNameLabel.textContent = "No file chosen";
-          fileNameLabel.classList.add("text-gray-500", "italic");
-          fileNameLabel.classList.remove("text-slate-800", "font-medium");
+      }
+
+      function syncLightsToVideo() {
+        if (video.paused || video.ended) {
+          cancelAnimationFrame(animationFrameId);
+          return;
         }
-      });
-    }
+
+        updateForCurrentTime();
+        animationFrameId = requestAnimationFrame(syncLightsToVideo);
+      }
+
+      if (video) {
+        // Run initial sync check
+        video.addEventListener("loadedmetadata", () => {
+          updateForCurrentTime();
+        });
+
+        // If video is already loaded or playing when script runs
+        if (video.readyState >= 1) {
+          updateForCurrentTime();
+        }
+
+        video.addEventListener("play", () => {
+          syncLightsToVideo();
+        });
+
+        video.addEventListener("pause", () => {
+          cancelAnimationFrame(animationFrameId);
+          updateForCurrentTime();
+        });
+
+        video.addEventListener("seeking", () => {
+          updateForCurrentTime();
+        });
+
+        video.addEventListener("seeked", () => {
+          updateForCurrentTime();
+        });
+
+        video.addEventListener("timeupdate", () => {
+          updateForCurrentTime();
+        });
+
+        video.addEventListener("ended", () => {
+          cancelAnimationFrame(animationFrameId);
+          resetLights();
+        });
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+          if (videoSection) {
+            videoSection.remove();
+          }
+          if (fileInput) {
+            fileInput.value = "";
+            fileNameLabel.textContent = "No file chosen";
+            fileNameLabel.classList.add("text-gray-500", "italic");
+            fileNameLabel.classList.remove("text-slate-800", "font-medium");
+          }
+        });
+      }
     }
   </script>
 
