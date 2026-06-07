@@ -5,15 +5,72 @@ ActiGuard-LLM is an AI-powered real-time security surveillance system. It integr
 ---
 
 ## 📽️ Test Result Videos & Outputs
-Reviewers can quickly verify the performance and accuracy of ActiGuard-LLM by viewing the input and output test files:
+Reviewers can quickly verify the performance and accuracy of ActiGuard-LLM by viewing the input and output test results below.
 
-| # | Input Video | Output Video | Key Observation / Analysis |
-|---|-------------|--------------|----------------------------|
-| 1 | [Input_Video_1.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_1.mp4) | `Test_output_vidoes/test_1.webm` | Sudden escalation; physical struggle detected; high confidence scores. |
-| 2 | [Input_Video_2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_2.mp4) | `Test_output_vidoes/test_2.webm` | Normal crowd activity; steady green indicator showing normal behavior. |
-| 3 | [Input_Video_4.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_4.mp4) | `Test_output_vidoes/test_4.webm` | General public environment; no physical conflict; high normal confidence. |
-| 4 | [Input_video_5.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_video_5.mp4) | `Test_output_vidoes/test_5.webm` | Physical altercations detected; triggers real-time red blinking indicator. |
-| 5 | [fight2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/static/uploads/fight2.mp4) | `static/processed/processed_fight2.mp4` | Rapid outbreak of violence; email notification and location mapping dispatched. |
+---
+
+### 🎬 Test 1 — Violence Detected
+> Sudden escalation; physical struggle detected; high confidence scores.
+
+**📥 Input Video:** [Input_Video_1.mp4](Test_Input%20videos/Input_Video_1.mp4)
+
+**📤 Output Video:**
+
+<video src="Test_output_vidoes/test_1.webm" controls width="720">
+  Your browser does not support the video tag.
+</video>
+
+---
+
+### 🎬 Test 2 — Non-Violence
+> Normal crowd activity; steady green indicator showing normal behavior.
+
+**📥 Input Video:** [Input_Video_2.mp4](Test_Input%20videos/Input_Video_2.mp4)
+
+**📤 Output Video:**
+
+<video src="Test_output_vidoes/test_2.webm" controls width="720">
+  Your browser does not support the video tag.
+</video>
+
+---
+
+### 🎬 Test 3 — Non-Violence
+> General public environment; no physical conflict; high normal confidence.
+
+**📥 Input Video:** [Input_Video_4.mp4](Test_Input%20videos/Input_Video_4.mp4)
+
+**📤 Output Video:**
+
+<video src="Test_output_vidoes/test_4.webm" controls width="720">
+  Your browser does not support the video tag.
+</video>
+
+---
+
+### 🎬 Test 4 — Violence Detected
+> Physical altercations detected; triggers real-time red blinking indicator.
+
+**📥 Input Video:** [Input_video_5.mp4](Test_Input%20videos/Input_video_5.mp4)
+
+**📤 Output Video:**
+
+<video src="Test_output_vidoes/test_5.webm" controls width="720">
+  Your browser does not support the video tag.
+</video>
+
+---
+
+### 🎬 Test 5 — Violence Detected
+> Rapid outbreak of violence; email notification and location mapping dispatched.
+
+**📥 Input Video:** [fight2.mp4](static/uploads/fight2.mp4)
+
+**📤 Output Video:**
+
+<video src="static/processed/processed_fight2.mp4" controls width="720">
+  Your browser does not support the video tag.
+</video>
 
 ---
 
