@@ -40,7 +40,7 @@ Reviewers can quickly verify the performance and accuracy of ActiGuard-LLM by vi
 
 ---
 
-### 🎬 Test 4 — Violence Detected
+### 🎬 Test 4 
 > Physical altercations detected; triggers real-time red blinking indicator.
 
 | | |
