@@ -7,13 +7,13 @@ ActiGuard-LLM is an AI-powered real-time security surveillance system. It integr
 ## 📽️ Test Result Videos & Outputs
 Reviewers can quickly verify the performance and accuracy of ActiGuard-LLM by viewing the input and output test files:
 
-| # | Input Video | Output Video | Detection Result | Key Observation / Analysis |
-|---|-------------|--------------|------------------|----------------------------|
-| 1 | [Input_Video_1.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_1.mp4) | `Test_output_vidoes/test_1.webm` | **Violence** | Sudden escalation; physical struggle detected; high confidence scores. |
-| 2 | [Input_Video_2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_2.mp4) | `Test_output_vidoes/test_2.webm` | **Non-Violence** | Normal crowd activity; steady green indicator showing normal behavior. |
-| 3 | [Input_Video_4.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_4.mp4) | `Test_output_vidoes/test_4.webm` | **Non-Violence** | General public environment; no physical conflict; high normal confidence. |
-| 4 | [Input_video_5.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_video_5.mp4) | `Test_output_vidoes/test_5.webm` | **Violence** | Physical altercations detected; triggers real-time red blinking indicator. |
-| 5 | [fight2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/static/uploads/fight2.mp4) | `static/processed/processed_fight2.mp4` | **Violence** | Rapid outbreak of violence; email notification and location mapping dispatched. |
+| # | Input Video | Output Video | Key Observation / Analysis |
+|---|-------------|--------------|----------------------------|
+| 1 | [Input_Video_1.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_1.mp4) | `Test_output_vidoes/test_1.webm` | Sudden escalation; physical struggle detected; high confidence scores. |
+| 2 | [Input_Video_2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_2.mp4) | `Test_output_vidoes/test_2.webm` | Normal crowd activity; steady green indicator showing normal behavior. |
+| 3 | [Input_Video_4.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_Video_4.mp4) | `Test_output_vidoes/test_4.webm` | General public environment; no physical conflict; high normal confidence. |
+| 4 | [Input_video_5.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/Test_Input%20videos/Input_video_5.mp4) | `Test_output_vidoes/test_5.webm` | Physical altercations detected; triggers real-time red blinking indicator. |
+| 5 | [fight2.mp4](file:///c:/Users/DELL/Desktop/Our%20Actigurad%20System/static/uploads/fight2.mp4) | `static/processed/processed_fight2.mp4` | Rapid outbreak of violence; email notification and location mapping dispatched. |
 
 ---
 
@@ -71,9 +71,8 @@ pip install flask ultralytics python-dotenv requests opencv-python
 Create a file named `.env` in the root directory:
 ```env
 # Email Alert Config
-EMAIL_SENDER="your-email@gmail.com"
+
 EMAIL_PASSWORD="your-app-password" # App password from email provider
-EMAIL_RECEIVER="recipient-email@gmail.com"
 
 # Google Maps Static API Key
 GOOGLE_MAPS_API_KEY="your-google-maps-api-key"
@@ -107,4 +106,4 @@ By default, the server runs on `http://127.0.0.1:5000/`.
 * Play the video. You will see the **Violence** (Red) and **Non-Violence** (Green) indicator lights toggle in real-time.
 * Hovering, scrubbing, or pausing the video dynamically locks the lights and displays the confidence score for that specific frame.
 * Read the narrative incident report on the right-hand panel.
-* If violence is detected, verify your inbox for the immediate geolocation email alert containing the Google Static Map marker.
+
