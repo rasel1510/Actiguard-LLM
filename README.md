@@ -6,73 +6,49 @@ ActiGuard-LLM is an AI-powered real-time security surveillance system. It integr
 
 ## 📽️ Test Result Videos & Outputs
 Reviewers can quickly verify the performance and accuracy of ActiGuard-LLM by viewing the input and output test results below.
+> 💡 Click any **▶ Watch Output Video** link to open GitHub's built-in video player.
 
 ---
 
-### 🎬 Test 1 — Violence Detected
+### 🎬 Test 1 
 > Sudden escalation; physical struggle detected; high confidence scores.
 
-**📥 Input Video:** [Input_Video_1.mp4](Test_Input%20videos/Input_Video_1.mp4)
-
-**📤 Output Video:**
-
-<video src="Test_output_vidoes/test_1.webm" controls width="720">
-  Your browser does not support the video tag.
-</video>
+| | |
+|---|---|
+| 📥 **Input Video** | [Input_Video_1.mp4](Test_Input%20videos/Input_Video_1.mp4) |
+| 📤 **Output Video** | [▶ Watch Output Video](https://github.com/rasel1510/Actiguard-LLM/blob/main/Test_output_vidoes/test_1.webm) |
 
 ---
 
-### 🎬 Test 2 — Non-Violence
+### 🎬 Test 2 
 > Normal crowd activity; steady green indicator showing normal behavior.
 
-**📥 Input Video:** [Input_Video_2.mp4](Test_Input%20videos/Input_Video_2.mp4)
-
-**📤 Output Video:**
-
-<video src="Test_output_vidoes/test_2.webm" controls width="720">
-  Your browser does not support the video tag.
-</video>
+| | |
+|---|---|
+| 📥 **Input Video** | [Input_Video_2.mp4](Test_Input%20videos/Input_Video_2.mp4) |
+| 📤 **Output Video** | [▶ Watch Output Video](https://github.com/rasel1510/Actiguard-LLM/blob/main/Test_output_vidoes/test_2.webm) |
 
 ---
 
-### 🎬 Test 3 — Non-Violence
+### 🎬 Test 3 
 > General public environment; no physical conflict; high normal confidence.
 
-**📥 Input Video:** [Input_Video_4.mp4](Test_Input%20videos/Input_Video_4.mp4)
-
-**📤 Output Video:**
-
-<video src="Test_output_vidoes/test_4.webm" controls width="720">
-  Your browser does not support the video tag.
-</video>
+| | |
+|---|---|
+| 📥 **Input Video** | [Input_Video_4.mp4](Test_Input%20videos/Input_Video_4.mp4) |
+| 📤 **Output Video** | [▶ Watch Output Video](https://github.com/rasel1510/Actiguard-LLM/blob/main/Test_output_vidoes/test_4.webm) |
 
 ---
 
 ### 🎬 Test 4 — Violence Detected
 > Physical altercations detected; triggers real-time red blinking indicator.
 
-**📥 Input Video:** [Input_video_5.mp4](Test_Input%20videos/Input_video_5.mp4)
+| | |
+|---|---|
+| 📥 **Input Video** | [Input_video_5.mp4](Test_Input%20videos/Input_video_5.mp4) |
+| 📤 **Output Video** | [▶ Watch Output Video](https://github.com/rasel1510/Actiguard-LLM/blob/main/Test_output_vidoes/test_5.webm) |
 
-**📤 Output Video:**
 
-<video src="Test_output_vidoes/test_5.webm" controls width="720">
-  Your browser does not support the video tag.
-</video>
-
----
-
-### 🎬 Test 5 — Violence Detected
-> Rapid outbreak of violence; email notification and location mapping dispatched.
-
-**📥 Input Video:** [fight2.mp4](static/uploads/fight2.mp4)
-
-**📤 Output Video:**
-
-<video src="static/processed/processed_fight2.mp4" controls width="720">
-  Your browser does not support the video tag.
-</video>
-
----
 
 ## 🏗️ System Design & Architecture
 ActiGuard-LLM is built on a modular pipeline ensuring low-latency inference, rich UI interaction, and secure alert propagation:
