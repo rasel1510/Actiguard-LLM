@@ -1,6 +1,6 @@
 # ActiGuard-LLM: Smart Surveillance & Violence Detection System
 
-ActiGuard-LLM is an AI-powered real-time security surveillance system. It integrates computer vision (**YOLOv8**), Large Language Models (**LLMs via OpenRouter**), location tracking (**Google Maps Static API**), and instant notification protocols (**SMTP/Email**) to detect violence, generate security incident reports, and dispatch geolocated alerts immediately.
+ActiGuard-LLM is an AI-powered real-time security surveillance system. It integrates computer vision (**FMF-YOLO**), Large Language Models (**LLMs via OpenRouter**), location tracking (**Google Maps Static API**), and instant notification protocols (**SMTP/Email**) to detect violence, generate security incident reports, and dispatch geolocated alerts immediately.
 
 ---
 
@@ -23,7 +23,7 @@ ActiGuard-LLM is built on a modular pipeline ensuring low-latency inference, ric
 ```mermaid
 flowchart TD
     A[Surveillance Video Feed] -->|Upload via Web UI| B[Flask Backend App]
-    B -->|Extract Frames & Run Inference| C[YOLOv8 Inference Engine - best.pt]
+    B -->|Extract Frames & Run Inference| C[FMF-YOLO Inference Engine - best.pt]
     C -->|Generate Frame-by-Frame Metrics| B
     B -->|Chronological Timeline Data| D[OpenRouter API]
     D -->|Prompt LLM Reasoning| E[Google Gemini 2.5 Flash / Llama 3]
@@ -35,17 +35,17 @@ flowchart TD
 ```
 
 ### Key Workflow Steps
-1. **Video Processing**: The user uploads a video file. The Flask backend processes it using custom YOLOv8 weights (`best.pt`) optimized for violence classification. Bounding boxes and confidence thresholds are extracted at dynamic frame rates to ensure rapid processing.
+1. **Video Processing**: The user uploads a video file. The Flask backend processes it using custom FMF-YOLO weights (`best.pt`) optimized for violence classification. Bounding boxes and confidence thresholds are extracted at dynamic frame rates to ensure rapid processing.
 2. **LLM Summary Generation**: Frame results are formatted into a chronological timeline sequence. This state data is sent to OpenRouter API (Gemini 2.5 Flash / Llama 3) to draft a narrative incident report summarizing escalation points, transitions, and durations.
 3. **Alert & Geolocation Dispatch**: If violence is detected, the frontend client captures the browser's current GPS location. The backend takes the coordinates, queries the Google Maps Static API for an image map, and dispatches an email notification containing the map, coordinates, and details to safety personnel.
-4. **Interactive Dashboard Sync**: The frontend features a custom HTML5 video player synchronized frame-by-frame with the YOLOv8 confidence scores. Interactive indicators (Red for Violence, Green for Non-Violence) dynamically blink and reflect active scores.
+4. **Interactive Dashboard Sync**: The frontend features a custom HTML5 video player synchronized frame-by-frame with the FMF-YOLO confidence scores. Interactive indicators (Red for Violence, Green for Non-Violence) dynamically blink and reflect active scores.
 
 ---
 
 ## 🛠️ Tools & Technologies Used
 * **Web Framework**: Python Flask (Robust, lightweight server-side routing)
-* **Computer Vision**: YOLOv8 (Ultralytics) (High-speed spatial feature and action recognition)
-* **Language Models**: Google Gemini 2.5 Flash & Meta Llama 3 (via OpenRouter API)
+* **Computer Vision**: FMF-YOLO (High-speed spatial feature and action recognition)
+* **Language Models**: Deepseek R1 & Meta Llama 3 (via OpenRouter API)
 * **Map & Coordinates API**: Google Maps Static API (Geographic image mapping)
 * **Front-End Styling**: TailwindCSS (Modern, clean, responsive UI layouts)
 * **Notification Protocol**: SMTP / SSL (Secure mail transmission)
