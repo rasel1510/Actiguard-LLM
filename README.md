@@ -75,6 +75,31 @@ flowchart TD
 
 ---
 
+## 📁 Project Folder Structure
+
+```text
+ActiGuard-LLM/
+├─ app.py
+├─ requirements.txt
+├─ Procfile
+├─ .gitignore
+├─ .env (ignored)
+├─ README.md
+├─ templates/
+│   ├─ index.html
+│   └─ Navbar.html
+├─ static/
+│   ├─ index.html
+│   └─ Navbar.html
+├─ models/
+│   └─ best.pt
+├─ utils/
+│   └─ (script files like FMF-YOLO.py, LLM_evaluation.py, etc.)
+└─ Test_Input videos/
+    ├─ Input_Video_1.mp4
+    └─ ...
+```
+
 ## 🛠️ Tools & Technologies Used
 * **Web Framework**: Python Flask (Robust, lightweight server-side routing)
 * **Computer Vision**: FMF-YOLO (High-speed spatial feature and action recognition)
